@@ -1,5 +1,6 @@
 package com.urosdragojevic.realbookstore.repository;
 
+import com.urosdragojevic.realbookstore.audit.AuditLogger;
 import com.urosdragojevic.realbookstore.domain.Rating;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,11 @@ public class RatingRepository {
                     preparedStatement.setInt(3, rating.getUserId());
                     preparedStatement.executeUpdate();
                 }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                    LOG.error("Failed to update");
+                }
+                AuditLogger.getAuditLogger(BookRepository.class).audit("Successfully updated ratings");
             } else {
                 try (PreparedStatement preparedStatement = connection.prepareStatement(query3)) {
                     preparedStatement.setInt(1, rating.getBookId());
@@ -43,10 +49,17 @@ public class RatingRepository {
                     preparedStatement.setInt(3, rating.getRating());
                     preparedStatement.executeUpdate();
                 }
+                catch (SQLException e) {
+                    e.printStackTrace();
+                    LOG.error("Failed to insert");
+                }
+                AuditLogger.getAuditLogger(BookRepository.class).audit("Successfully inserted ratings");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            LOG.error("Failed to get info");
         }
+        AuditLogger.getAuditLogger(BookRepository.class).audit("Successfully retrieved ratings");
     }
 
     public List<Rating> getAll(int bookId) {
@@ -60,7 +73,9 @@ public class RatingRepository {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            LOG.warn("Failed to get ratings for book " + bookId);
         }
+        AuditLogger.getAuditLogger(BookRepository.class).audit("Successfully retrieved ratings");
         return ratingList;
     }
 

@@ -1,5 +1,6 @@
 package com.urosdragojevic.realbookstore.repository;
 
+import com.urosdragojevic.realbookstore.audit.AuditLogger;
 import com.urosdragojevic.realbookstore.domain.Permission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,9 @@ public class PermissionRepository {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            LOG.warn("Failed to find role " + roleId);
         }
+        AuditLogger.getAuditLogger(BookRepository.class).audit("Successfully found permissions for role " + roleId);
         return permissions;
     }
 }
